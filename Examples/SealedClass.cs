@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RandomConsole.Examples
 {
-    // Sealed modifier prevents other classes from inheriting from it.
+    // Sealed modifier prevents other classes from inheriting.
     sealed class SealedClass
     {
         public int x;

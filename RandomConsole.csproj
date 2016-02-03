@@ -44,7 +44,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Examples\AnonymousType.cs" />
+    <Compile Include="Examples\Asynchronous.cs" />
     <Compile Include="Examples\SealedClass.cs" />
+    <Compile Include="Examples\Tasks.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
