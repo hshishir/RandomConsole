@@ -36,10 +36,6 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Management.Automation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>packages\System.Management.Automation.6.1.7601.17515\lib\net45\System.Management.Automation.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -50,8 +46,8 @@
   <ItemGroup>
     <Compile Include="Examples\AnonymousType.cs" />
     <Compile Include="Examples\Asynchronous.cs" />
+    <Compile Include="Examples\Delegate.cs" />
     <Compile Include="Examples\Requires.cs" />
-    <Compile Include="Examples\SampleCmdlet.cs" />
     <Compile Include="Examples\SealedClass.cs" />
     <Compile Include="Examples\StringImageResource.cs" />
     <Compile Include="Examples\Tasks.cs" />
@@ -73,7 +69,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="Resources\DayOfCaring.jpg" />
   </ItemGroup>
   <ItemGroup>

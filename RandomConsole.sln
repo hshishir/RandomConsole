@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RandomConsole", "RandomConsole.csproj", "{3BC9903C-3669-4935-BE27-E7D01511F844}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCmdlets", "MyCmdlets\MyCmdlets.csproj", "{5A90C31B-4E86-46DA-ADEF-02B87DFAEB9A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{3BC9903C-3669-4935-BE27-E7D01511F844}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3BC9903C-3669-4935-BE27-E7D01511F844}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3BC9903C-3669-4935-BE27-E7D01511F844}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A90C31B-4E86-46DA-ADEF-02B87DFAEB9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A90C31B-4E86-46DA-ADEF-02B87DFAEB9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A90C31B-4E86-46DA-ADEF-02B87DFAEB9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A90C31B-4E86-46DA-ADEF-02B87DFAEB9A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
