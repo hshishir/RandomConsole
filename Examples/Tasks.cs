@@ -8,8 +8,23 @@ using System.Threading.Tasks;
 
 namespace RandomConsole.Examples
 {
-    public class Tasks
+    public class TaskExample
     {
+        private Common _common;
+        public TaskExample()
+        {
+            _common = new Common();
+        }
+
+        public void UsingParallelInvoke()
+        {
+            var sw = Stopwatch.StartNew();
+            Parallel.Invoke(() => _common.BookCar(), () => _common.BookHotel(), () => _common.BookPlane());
+            sw.Stop();
+
+            Console.WriteLine("Time taken: {0}", sw.Elapsed.Seconds);
+        }
+
         public void TestMe()
         {
             var common = new Common();
@@ -79,6 +94,21 @@ namespace RandomConsole.Examples
             Thread.Sleep(TimeSpan.FromSeconds(3));
             Console.WriteLine("Done with car.");
             return new Random().Next(100);
+        }
+    }
+
+    public class TaskCreation
+    {
+        public void MethodOne()
+        {
+            var taskA = new Task(() => 
+            {
+                Console.WriteLine("Hello from Task A");
+            });
+
+            taskA.Start();
+            Console.WriteLine("Hello from thread: {0}", Thread.CurrentThread.Name);
+            taskA.Wait();
         }
     }
 }
