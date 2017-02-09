@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RandomConsole", "RandomCons
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCmdlets", "MyCmdlets\MyCmdlets.csproj", "{5A90C31B-4E86-46DA-ADEF-02B87DFAEB9A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReleaseManagment", "ReleaseManagment\ReleaseManagment.csproj", "{51F04F75-C491-4888-9A55-7FB5B7F7B5A3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RMClient", "..\RMClient\RMClient.csproj", "{5D5A50B6-6698-40EF-810C-4BCDA3F73A51}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{5A90C31B-4E86-46DA-ADEF-02B87DFAEB9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A90C31B-4E86-46DA-ADEF-02B87DFAEB9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A90C31B-4E86-46DA-ADEF-02B87DFAEB9A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51F04F75-C491-4888-9A55-7FB5B7F7B5A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51F04F75-C491-4888-9A55-7FB5B7F7B5A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51F04F75-C491-4888-9A55-7FB5B7F7B5A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51F04F75-C491-4888-9A55-7FB5B7F7B5A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D5A50B6-6698-40EF-810C-4BCDA3F73A51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D5A50B6-6698-40EF-810C-4BCDA3F73A51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D5A50B6-6698-40EF-810C-4BCDA3F73A51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D5A50B6-6698-40EF-810C-4BCDA3F73A51}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
