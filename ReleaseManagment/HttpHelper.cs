@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Azure.KeyVault;
+using Microsoft.Azure.Services.AppAuthentication;
+using System;
 using System.Configuration;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -10,20 +12,7 @@ namespace ReleaseManagment
     {
         public static HttpClient GetJsonClient(VstsResource vstsResource)
         {
-            var pat = string.Empty;
-            switch (vstsResource)
-            {
-                case VstsResource.Build:
-                    break;
-                case VstsResource.Release:
-                    pat = ConfigurationManager.AppSettings["Release.Pat"];
-                    break;
-                case VstsResource.TestManagement:
-                    pat = ConfigurationManager.AppSettings["TestManagement.Pat"];
-                    break;
-                default:
-                    break;
-            }
+            var pat = GetPatFromKeyVault(vstsResource);
             var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Accept.Clear();
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -31,6 +20,34 @@ namespace ReleaseManagment
                 Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", pat))));
 
             return httpClient;
+        }
+
+        private static string GetPatFromKeyVault(VstsResource vstsResource)
+        {
+            var pat = string.Empty;
+            switch (vstsResource)
+            {
+                case VstsResource.Build:
+                    break;
+                case VstsResource.Release:
+                    pat = GetTestResultPat(ConfigurationManager.AppSettings["VstsReleasePat.KeyVaultUri"]);
+                    break;
+                case VstsResource.TestManagement:
+                    pat = GetTestResultPat(ConfigurationManager.AppSettings["VstsTestManagementPat.KeyVaultUri"]);
+                    break;
+                default:
+                    break;
+            }
+
+            return pat;
+        }
+
+        private static string GetTestResultPat(string secretUri)
+        {
+            var tokenProvider = new AzureServiceTokenProvider("AuthenticateAs=User");
+            var kv = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(tokenProvider.KeyVaultTokenCallback));
+            var secret = kv.GetSecretAsync(secretUri).Result;
+            return secret.Value;
         }
     }
 

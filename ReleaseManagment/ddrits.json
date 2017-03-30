@@ -1,0 +1,21 @@
+﻿{
+    "_comment": "This file contains list of test assemblies for DDRITs",
+    "testcontainer": [
+        {
+            "name": "comments.dll",
+            "includedtests": [
+                "Test1",
+                "Test2"
+            ]
+        },
+        {
+            "name": "microsoft.visualstudio.javascript.project.ddrit.dll"
+        },
+        {
+            "name": "microsoft.visualstudio.web.ddrit.dll",
+        },
+        {
+            "name": "xsdtool.dll"
+        }
+    ]
+}

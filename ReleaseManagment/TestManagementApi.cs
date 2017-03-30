@@ -9,12 +9,19 @@ using System.Net.Http;
 using Microsoft.VisualStudio.Services.Client;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.TeamFoundation.TestManagement.WebApi;
+using ReleaseManagment.TestRun;
 
 namespace ReleaseManagment
 {
     public class TestManagementApi
     {
 
+        //public static async Task<IEnumerable<TestRunResult>> GetTestRunResults(string branchName, string buildNumber, RunType runType)
+        //{
+        //    var resultSummary = await GetTestResultSummary(releaseId);
+        //    var testRunResults = new List<TestRunResult>();
+        //    return testRunResults;
+        //}
         public static async Task<TestRunResult> GetTestRunResult(int releaseId)
         {
             var resultSummary = await GetTestResultSummary(releaseId);
@@ -22,8 +29,10 @@ namespace ReleaseManagment
             {
                 ReleaseId = releaseId,
                 TotalCount = resultSummary.aggregatedResultsAnalysis.totalTests,
-                PassedCount = resultSummary.aggregatedResultsAnalysis.resultsByOutcome.Passed.count,
-                FailedCount = resultSummary.aggregatedResultsAnalysis.resultsByOutcome.Failed.count
+                PassedCount = (resultSummary.aggregatedResultsAnalysis.resultsByOutcome.Passed != null)
+                ? resultSummary.aggregatedResultsAnalysis.resultsByOutcome.Passed.count : 0,
+                FailedCount = (resultSummary.aggregatedResultsAnalysis.resultsByOutcome.Failed != null) 
+                ? resultSummary.aggregatedResultsAnalysis.resultsByOutcome.Failed.count : 0
 
             };
 
@@ -39,11 +48,17 @@ namespace ReleaseManagment
                 }
             }
 
+            testRunResult.Category = categories;
+
+            if (buildData == null)
+            {
+                return testRunResult;
+            }
+
             testRunResult.BuildUrl = buildData.url;
             var tokens = buildData.name.Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
             testRunResult.BranchName = tokens[0];
             testRunResult.BuildNumber = tokens[1];
-            testRunResult.Category = categories;
             return testRunResult;
         }
 
@@ -73,9 +88,9 @@ namespace ReleaseManagment
             Build buildData = null;
             foreach (var item in result.value)
             {
-                Outcome outcome;
+                TestCaseOutcome outcome;
                 OverallState state;
-                Enum.TryParse<Outcome>(item.outcome, out outcome);
+                Enum.TryParse<TestCaseOutcome>(item.outcome, out outcome);
                 Enum.TryParse<OverallState>(item.state, out state);
                 testCaseResult.Add(new TestCaseResult
                 {
@@ -84,7 +99,6 @@ namespace ReleaseManagment
                     StartDate = item.startedDate,
                     CompletedDate = item.completedDate,
                     Outcome = outcome,
-                    State = state
                 });
 
                 if(buildData == null)
@@ -129,7 +143,7 @@ namespace ReleaseManagment
             return result;
         }
 
-        private static async Task<TestResult> GetTestResult(int runId)
+        public static async Task<TestResult> GetTestResult(int runId)
         {
             var account = ConfigurationManager.AppSettings["Vsts.Account"];
             var project = ConfigurationManager.AppSettings["Vsts.Project"];
@@ -152,6 +166,17 @@ namespace ReleaseManagment
             //var result = await response.Content.ReadAsStringAsync();
             //var jsonObj = JObject.Parse(result);
             var result = await response.Content.ReadAsAsync<ResultDetails>();
+            return result;
+        }
+
+        public static async Task<TestRunResponse> GetTestRuns(string buildUri)
+        {
+            var jsonClient = HttpHelper.GetJsonClient(VstsResource.TestManagement);
+            var account = ConfigurationManager.AppSettings["Vsts.Account"];
+            var project = ConfigurationManager.AppSettings["Vsts.Project"];
+            var requestUrl = $"https://{account}.visualstudio.com/DefaultCollection/{project}/_apis/test/runs?api-version=1.0&buildUri={buildUri}";
+            var response = await jsonClient.GetAsync(requestUrl);
+            var result = await response.Content.ReadAsAsync<TestRunResponse>();
             return result;
         }
 

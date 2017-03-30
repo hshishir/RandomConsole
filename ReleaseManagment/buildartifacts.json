@@ -1,0 +1,49 @@
+﻿{
+    "_comment": "This file contains list of artifacts to be published to VSTS",
+    "artifacts": {
+        "builddata": {
+            "assets": [
+                {
+                    "name": "build.config",
+                    "relsrcpath": "binaries.x86ret"
+                },
+                {
+                    "name": "windowsosversion.msbuild",
+                    "relsrcpath": "binaries.x86ret\\bin\\i386\\semaphores"
+                }
+            ]
+        },
+        "unittests": {
+            "assets":
+            [
+                {
+                    "name": "*.trx",
+                    "relsrcpath": "binaries.x86ret\\build_logs\\unittests\\results",
+                    "reldestpath": "results",
+                    "destparent": "testresults"
+                }
+            ]
+        },
+            "vsmanifests": [
+                {
+                    "name": "publish.chman",
+                    "relsrcpath": "ddsetup\\sd\\setup\\setup\\swix"
+                },
+                {
+                    "name": "*.vsman",
+                    "relsrcpath": "ddsetup\\sd\\setup\\setup\\swix"
+                },
+                {
+                    "name": "*.*",
+                    "relsrcpath": "ddsetup\\sd\\setup\\setup\\swix\\engine",
+                    "reldestpath": "engine"
+                }
+            ],
+            "testsuites": [
+                {
+                    "name": "*.json",
+                    "relsrcpath": "dd\\src\\config\\testsuites"
+                }
+            ]
+        }
+}
