@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ReleaseManagment
 {
-    public class ResultDetails
+    public class TestRunResultDetailsResponse
     {
         public string groupByField { get; set; }
         public Resultsforgroup[] resultsForGroup { get; set; }
