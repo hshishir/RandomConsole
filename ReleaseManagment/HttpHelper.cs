@@ -5,6 +5,10 @@ using System.Configuration;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using Microsoft.TeamFoundation.TestManagement.WebApi;
+using Microsoft.VisualStudio.Services.Client;
+using Microsoft.VisualStudio.Services.Common;
+using Microsoft.VisualStudio.Services.WebApi;
 
 namespace ReleaseManagment
 {
@@ -22,7 +26,17 @@ namespace ReleaseManagment
             return httpClient;
         }
 
-        private static string GetPatFromKeyVault(VstsResource vstsResource)
+        public static TestManagementHttpClient GetTestManagementHttpClient()
+        {
+            var account = ConfigurationManager.AppSettings["Vsts.Account"];
+            var teamCollectionUrl = $"https://{account}.visualstudio.com/";
+            var pat = HttpHelper.GetPatFromKeyVault(VstsResource.TestManagement);
+            var connection = new VssConnection(new Uri(teamCollectionUrl), new VssBasicCredential(string.Empty, pat));
+            var client = connection.GetClient<TestManagementHttpClient>();
+            return client;
+        }
+
+        public static string GetPatFromKeyVault(VstsResource vstsResource)
         {
             var pat = string.Empty;
             switch (vstsResource)

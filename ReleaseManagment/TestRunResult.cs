@@ -14,6 +14,7 @@ namespace ReleaseManagment
         /// </summary>
         public int ReleaseId { get; set; }
 
+        public string ReleaseUrl { get; set; }
         /// <summary>
         /// Total number of tests
         /// </summary>
@@ -80,6 +81,8 @@ namespace ReleaseManagment
         /// </summary>
         public int RunId { get; set; }
 
+        public string ResultUrl { get; set; }
+
         /// <summary>
         /// Number of tests passed
         /// </summary>
@@ -89,6 +92,8 @@ namespace ReleaseManagment
         /// Number of tests failed
         /// </summary>
         public int FailCount { get; set; }
+
+        public int RunningCount { get; set; }
 
         /// <summary>
         /// Overall run state
@@ -115,6 +120,9 @@ namespace ReleaseManagment
         /// Test type (UnitTest etc.)
         /// </summary>
         public string TestType { get; set; }
+
+        public Build Build { get; set; }
+        public Project Project { get; set; }
 
         /// <summary>
         /// Test case run outcome
@@ -163,12 +171,12 @@ namespace ReleaseManagment
     /// </summary>
     public enum TestCaseOutcome
     {
+        Aborted,
         Error,
         Failed,
-        Timeout,
-        Aborted,
         Inconclusive,
         NotExecuted,
-        Passed
+        Passed,
+        Timeout
     }
 }

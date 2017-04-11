@@ -9,6 +9,7 @@ using System.Configuration;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Collections;
 
 namespace ReleaseManagment
 {
@@ -79,10 +80,10 @@ namespace ReleaseManagment
             {
                 testCategory
             };
-            
+
             if (buildData != null)
             {
-                 testRunResult.BuildUrl = buildData.Url;
+                testRunResult.BuildUrl = buildData.Url;
                 var tokens = buildData.Name.Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
                 testRunResult.BranchName = tokens[0];
                 testRunResult.BuildNumber = tokens[1];
@@ -105,35 +106,55 @@ namespace ReleaseManagment
                 where categoryNames == null || (categoryNames.Where(c => string.Equals(s.Name, c, StringComparison.OrdinalIgnoreCase)).Any())
                 select s;
 
-            var passCount = 0;
-           var failCount = 0;
-           Build buildData = null;
+            var runPassCount = 0;
+            var runFailCount = 0;
+            var runTotalCount = 0;
 
-           foreach (var testCategory in testCategories)
-           {
-               var testCaseResults = await GetTestCaseResults(testCategory);
-               passCount += testCategory.PassCount;
-               failCount += testCategory.FailCount;
-               testCategory.TestCaseResults = testCaseResults.Item1;
-               if (buildData == null)
-               {
-                   buildData = testCaseResults.Item2;
-               }
-           }
+            Build buildData = null;
+
+            foreach (var testCategory in testCategories)
+            {
+                var testCaseResults = await GetTestCaseResults(testCategory);
+                testCategory.TestCaseResults = testCaseResults.Item1;
+
+                // Update test category overall state and pass and fail count
+                var dict = GetTestCaseRunStates(testCaseResults.Item1);
+                var overallCategoryState = GetCategoryOverallState(dict);
+
+                testCategory.RunState = overallCategoryState;
+
+                testCategory.PassCount = dict.ContainsKey(TestCaseOutcome.Passed) ? dict[TestCaseOutcome.Passed] : 0;
+                testCategory.FailCount = (dict.ContainsKey(TestCaseOutcome.Failed) ? dict[TestCaseOutcome.Failed] : 0) +
+                    (dict.ContainsKey(TestCaseOutcome.Aborted) ? dict[TestCaseOutcome.Aborted] : 0) +
+                    (dict.ContainsKey(TestCaseOutcome.NotExecuted) ? dict[TestCaseOutcome.NotExecuted] : 0) +
+                    (dict.ContainsKey(TestCaseOutcome.Timeout) ? dict[TestCaseOutcome.Timeout] : 0) +
+                    (dict.ContainsKey(TestCaseOutcome.Inconclusive) ? dict[TestCaseOutcome.Inconclusive] : 0);
+
+                testCategory.RunningCount = dict.ContainsKey(TestCaseOutcome.Error) ? dict[TestCaseOutcome.Error] : 0;
+
+                runPassCount += testCategory.PassCount;
+                runFailCount += testCategory.FailCount;
+                runTotalCount += testCategory.TestCaseResults.Count();
+
+                if (buildData == null)
+                {
+                    buildData = testCaseResults.Item2;
+                }
+            }
 
             var testRunResult = new TestRunResult
             {
                 ReleaseId = releaseId,
-                PassCount = passCount,
-                FailCount = failCount,
-                TotalCount = passCount + failCount
+                PassCount = runPassCount,
+                FailCount = runFailCount,
+                TotalCount = runTotalCount
             };
 
-            testRunResult.TestCategoryResults = testCategories.OrderBy(x => x.Name).ToList<TestCategoryResult>();
+            testRunResult.TestCategoryResults = testCategories.OrderBy(x => x.Name).ToList();
 
             if (buildData != null)
             {
-                 testRunResult.BuildUrl = buildData.Url;
+                testRunResult.BuildUrl = buildData.Url;
                 var tokens = buildData.Name.Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
                 testRunResult.BranchName = tokens[0];
                 testRunResult.BuildNumber = tokens[1];
@@ -141,6 +162,47 @@ namespace ReleaseManagment
 
             return testRunResult;
         }
+
+
+        private static OverallState GetCategoryOverallState(Dictionary<TestCaseOutcome, int> categoryTestCaseOutcomes)
+        {
+            if (categoryTestCaseOutcomes.Keys.Contains(TestCaseOutcome.Error))
+            {
+                return OverallState.Running;
+            }
+            else if (categoryTestCaseOutcomes.Keys.Contains(TestCaseOutcome.Aborted) ||
+                    categoryTestCaseOutcomes.Keys.Contains(TestCaseOutcome.Failed) ||
+                    categoryTestCaseOutcomes.Keys.Contains(TestCaseOutcome.Inconclusive) ||
+                    categoryTestCaseOutcomes.Keys.Contains(TestCaseOutcome.NotExecuted) ||
+                    categoryTestCaseOutcomes.Keys.Contains(TestCaseOutcome.Timeout))
+            {
+                return OverallState.Failed;
+            }
+            else
+            {
+                return OverallState.Passed;
+            }
+        }
+
+        private static Dictionary<TestCaseOutcome, int> GetTestCaseRunStates(IEnumerable<TestCaseResult> testCaseResults)
+        {
+            var dict = new Dictionary<TestCaseOutcome, int>();
+            foreach (var testCase in testCaseResults)
+            {
+                if (dict.Keys.Contains(testCase.Outcome))
+                {
+                    dict[testCase.Outcome]++;
+                }
+                else
+                {
+                    dict.Add(testCase.Outcome, 1);
+                }
+            }
+
+            return dict;
+        }
+
+        
 
         private static async Task<IEnumerable<TestCategoryResult>> GetTestCategoryResults(int releaseId)
         {
@@ -161,6 +223,7 @@ namespace ReleaseManagment
 
             return testCategoryResults;
         }
+
         private static async Task<Tuple<IEnumerable<TestCaseResult>, Build>> GetTestCaseResults(TestCategoryResult testCategory)
         {
             var testCaseResult = new List<TestCaseResult>();
@@ -181,7 +244,7 @@ namespace ReleaseManagment
                     Outcome = outcome,
                 });
 
-                if(buildData == null)
+                if (buildData == null)
                 {
                     buildData = item.Build;
                 }
@@ -190,7 +253,7 @@ namespace ReleaseManagment
             return new Tuple<IEnumerable<TestCaseResult>, Build>(testCaseResult, buildData);
         }
 
-        
+
         //private static async Task<IEnumerable<TestCaseResult>> GetTestCaseResults(TestCategory testCategory)
         //{
         //    var testCaseResult = new List<TestCaseResult>();
@@ -305,15 +368,15 @@ namespace ReleaseManagment
             return result;
         }
 
-        public static void GetTestResultUsingClient()
-        {
-            var project = ConfigurationManager.AppSettings["Vsts.Project"];
-            var buildUrl = "https://devdiv.visualstudio.com/_apis/build/Builds/551173";
-            var teamCollectionUrl = "https://devdiv.visualstudio.com/";
-            var connection = new VssConnection(new Uri(teamCollectionUrl), new VssCredentials());
-            var client = connection.GetClient<TestManagementHttpClient>();
-            var testRuns = client.GetTestRunsAsync(projectId: project, buildUri: buildUrl).Result;
-            Console.WriteLine("Done" );
-        }
+        //public static void GetTestResultUsingClient()
+        //{
+        //    var project = ConfigurationManager.AppSettings["Vsts.Project"];
+        //    var buildUrl = "https://devdiv.visualstudio.com/_apis/build/Builds/551173";
+        //    var teamCollectionUrl = "https://devdiv.visualstudio.com/";
+        //    var connection = new VssConnection(new Uri(teamCollectionUrl), new VssCredentials());
+        //    var client = connection.GetClient<TestManagementHttpClient>();
+        //    var testRuns = client.GetTestRunsAsync(projectId: project, buildUri: buildUrl).Result;
+        //    Console.WriteLine("Done");
+        //}
     }
 }
