@@ -56,6 +56,7 @@
     <Compile Include="Examples\SealedClass.cs" />
     <Compile Include="Examples\StringImageResource.cs" />
     <Compile Include="Examples\Tasks.cs" />
+    <Compile Include="Examples\TaskWithRetry.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.Designer.cs">

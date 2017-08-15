@@ -12,7 +12,9 @@ namespace EncryptAppConfig
         static void Main(string[] args)
         {
             //EncryptAppConfigValue("App.config");
-            var value = ConfigurationManager.AppSettings["VstsTestManagementPat.KeyVaultUri"];
+            var secretUri  = ConfigurationManager.AppSettings["VstsTestManagementPat.KeyVaultUri"];
+            var project = ConfigurationManager.AppSettings["Vsts.Project"];
+            var account = ConfigurationManager.AppSettings["Vsts.Account"];
             Console.WriteLine("Complete");
         }
 
@@ -37,4 +39,6 @@ namespace EncryptAppConfig
             }
         }
     }
+
+    
 }

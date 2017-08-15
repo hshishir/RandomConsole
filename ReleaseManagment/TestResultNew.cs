@@ -1,4 +1,6 @@
 ﻿using Microsoft.TeamFoundation.TestManagement.WebApi;
+using Microsoft.TeamFoundation.Build.WebApi;
+
 //using Microsoft.TeamFoundation.Test.WebApi;
 using Microsoft.VisualStudio.Services.Client;
 using Microsoft.VisualStudio.Services.Common;
@@ -54,6 +56,20 @@ namespace ReleaseManagment
 
             var tcn = tc.Where(x => x.Build.Id.Equals(665723));
             Console.WriteLine("");
+
+
+            
+        }
+
+        public static void GetVariables()
+        {
+            var project = ConfigurationManager.AppSettings["Vsts.Project"];
+            var teamCollectionUrl = "https://devdiv.visualstudio.com/";
+            //var buildUrl = "vstfs:///Build/Build/665723";
+            var buildUrl = "vstfs:///Build/Build/551173";
+            var pat = HttpHelper.GetPatFromKeyVault(VstsResource.TestManagement);
+            var connection = new VssConnection(new Uri(teamCollectionUrl), new VssBasicCredential(string.Empty, pat));
+            //var client = connection.GetClient<>();
         }
 
         private static async Task<TestRunResultDetailsResponse> GetTestRunDetails(int releaseId)

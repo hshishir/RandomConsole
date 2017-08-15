@@ -11,11 +11,14 @@ namespace RandomConsole
         /// </summary>
         public class Options
         {
-            [Option("monitorddrit", Required = false, HelpText = "Monitor DDRITs", Default = false)]
+            [Option('m', "monitorddrit", Required = false, HelpText = "Monitor DDRITs", Default = false)]
             public bool MonitorDDRITs { get; set; }
 
-            [Option("createmessage", Required = false, HelpText = "Create build fabric message", Default = false)]
+            [Option('c', "createmessage", Required = false, HelpText = "Create build fabric message", Default = false)]
             public bool CreateMessage { get; set; }
+
+            [Option('n', "name", Required = false, HelpText = "Full name", Default = "")]
+            public string Name { get; set; }
         }
 
         private const int SuccessExitCode = 0;
@@ -33,11 +36,16 @@ namespace RandomConsole
 
         private static int DoWork(Options options)
         {
+            Console.WriteLine("DoWork!!");
             try
             {
                 if(options.MonitorDDRITs)
                 {
                     Console.WriteLine("Monitor DDRITS work");
+                    if (!string.IsNullOrWhiteSpace(options.Name))
+                    {
+                        Console.WriteLine($"Name: {options.Name}");
+                    }
                 }
 
                 if (options.CreateMessage)

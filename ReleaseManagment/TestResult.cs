@@ -1,6 +1,7 @@
 ﻿using Microsoft.TeamFoundation.TestManagement.WebApi;
 using Microsoft.VisualStudio.Services.Client;
 using Microsoft.VisualStudio.Services.Common;
+using Microsoft.VisualStudio.Services.WebApi;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -202,16 +203,16 @@ namespace ReleaseManagment
             return result;
         }
 
-        public static void GetTestResultUsingClient()
-        {
-            var project = ConfigurationManager.AppSettings["Vsts.Project"];
-            var buildUrl = "https://devdiv.visualstudio.com/_apis/build/Builds/551173";
-            var teamCollectionUrl = "https://devdiv.visualstudio.com/";
-            var connection = new VssConnection(new Uri(teamCollectionUrl), new VssCredentials());
-            var client = connection.GetClient<TestManagementHttpClient>();
-            var testRuns = client.GetTestRunsAsync(projectId: project, buildUri: buildUrl).Result;
-           // var testResults = client.GetTestResultsAsync(project, )
-            Console.WriteLine("Done");
-        }
+        //public static void GetTestResultUsingClient()
+        //{
+        //    var project = ConfigurationManager.AppSettings["Vsts.Project"];
+        //    var buildUrl = "https://devdiv.visualstudio.com/_apis/build/Builds/551173";
+        //    var teamCollectionUrl = "https://devdiv.visualstudio.com/";
+        //    var connection = new VssConnection(new Uri(teamCollectionUrl), new VssCredentials());
+        //    var client = connection.GetClient<TestManagementHttpClient>();
+        //    var testRuns = client.GetTestRunsAsync(projectId: project, buildUri: buildUrl).Result;
+        //   // var testResults = client.GetTestResultsAsync(project, )
+        //    Console.WriteLine("Done");
+        //}
     }
 }

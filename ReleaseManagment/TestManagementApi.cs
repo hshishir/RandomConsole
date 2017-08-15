@@ -10,6 +10,10 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Collections;
+using Newtonsoft.Json;
+using Microsoft.VisualStudio.Services.WebApi;
+using System.Text;
+using System.Net;
 
 namespace ReleaseManagment
 {
@@ -295,6 +299,142 @@ namespace ReleaseManagment
             var response = await jsonClient.GetAsync(requestUrl);
             var result = await response.Content.ReadAsAsync<TestCaseResultsResponse>();
             return result;
+        }
+
+        public static async Task<string> GetTestRun(int runId)
+        {
+            var account = ConfigurationManager.AppSettings["Vsts.Account"];
+            var project = ConfigurationManager.AppSettings["Vsts.Project"];
+            var requestUrl = $"https://{account}.visualstudio.com/{project}/_apis/test/runs/{runId}?api-version=1.0";
+
+            var jsonClient = HttpHelper.GetJsonClient(VstsResource.TestManagement);
+            var response = await jsonClient.GetAsync(requestUrl);
+            var result = await response.Content.ReadAsStringAsync();
+            var jobj = JObject.Parse(result);
+
+
+            return result;
+        }
+
+        public static string GetTestRunComment(int runId)
+        {
+            var testRun = GetTestRun(runId).Result;
+            var jobj = JObject.Parse(testRun);
+            var comment = jobj["comment"].ToString();
+            return comment;
+        }
+
+
+        public static async Task<int> UpdateTestResult(int runId, int testResultId = 100000)
+        {
+            var account = ConfigurationManager.AppSettings["Vsts.Account"];
+            var project = ConfigurationManager.AppSettings["Vsts.Project"];
+            var requestUrl = $"https://{account}.visualstudio.com/DefaultCollection/{project}/_apis/test/runs/{runId}/results?api-version=3.0-preview";
+
+            var jsonClient = HttpHelper.GetJsonClient(VstsResource.TestManagement);
+
+            var sbuilder = new StringBuilder();
+            sbuilder.AppendLine("## Link ");
+            sbuilder.AppendLine("#### [Link to CNN](http://www.cnn.com/)");
+            sbuilder.AppendLine("#### [Link to MSDN](https://msdn.microsoft.com/en-us/default.aspx)");
+            sbuilder.AppendLine("## Checklist");
+            sbuilder.AppendLine("- [ ] A ");
+            sbuilder.AppendLine("- [x] B");
+            sbuilder.AppendLine();
+            sbuilder.AppendLine();
+
+            var options = new
+            {
+                id = testResultId,
+                comment = sbuilder.ToString()
+            };
+
+            var optionsArr = new List<object>
+            {
+                options
+            };
+
+            var jsonString = JsonConvert.SerializeObject(optionsArr);
+            var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
+            Console.WriteLine($"Json String:{jsonString}");
+            var response = jsonClient.PatchAsync(requestUrl, httpContent).Result;
+            var statusCode = -1;
+            if (response.IsSuccessStatusCode)
+            {
+                statusCode = await response.Content.ReadAsAsync<int>();
+            }
+            else
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(responseContent);
+            }
+
+            return statusCode;
+        }
+
+        public static async Task<HttpStatusCode> UpdateTestRun(int runId, string runComment, bool append = false)
+        {
+            var account = ConfigurationManager.AppSettings["Vsts.Account"];
+            var project = ConfigurationManager.AppSettings["Vsts.Project"];
+            var requestUrl = $"https://{account}.visualstudio.com/DefaultCollection/{project}/_apis/test/runs/{runId}?api-version=3.0-preview";
+
+
+            var jsonClient = HttpHelper.GetJsonClient(VstsResource.TestManagement);
+
+            //var sbuilder = new StringBuilder();
+            //sbuilder.AppendLine("## Link ");
+            //sbuilder.AppendLine("#### [Link to CNN](http://www.cnn.com/)");
+            //sbuilder.AppendLine("#### [Link to MSDN](https://msdn.microsoft.com/en-us/default.aspx)");
+            //sbuilder.AppendLine("## List");
+            //sbuilder.AppendLine("1. First");
+            //sbuilder.AppendLine("2. Second");
+            //sbuilder.AppendLine("- Third");
+            //sbuilder.AppendLine("- Fourth");
+
+            //sbuilder.AppendLine("## Table");
+            //sbuilder.AppendLine("| Heading 1 | Heading 2 | Heading 3 |");
+            //sbuilder.AppendLine("|-----------|:-----------:|-----------:|");
+            //sbuilder.AppendLine("| Cell A1 | Cell A2 | Cell A3 |");
+            //sbuilder.AppendLine("| Cell B1 | Cell B2 | Cell B3 |");
+
+            //sbuilder.AppendLine("## Checklist");
+            //sbuilder.AppendLine("- [ ] A ");
+            //sbuilder.AppendLine("- [x] B");
+            //sbuilder.AppendLine();
+            //sbuilder.AppendLine();
+
+            var sbuilder = new StringBuilder();
+            sbuilder.AppendLine("## Error Message Link ");
+            sbuilder.AppendLine("#### [Link to Apple](http://www.apple.com/)");
+
+            var updatedComment = string.Empty;
+
+            if (append)
+            {
+                var originalComment = GetTestRunComment(runId);
+                updatedComment += originalComment;
+            }
+
+            updatedComment += runComment;
+
+            var options = new
+            {
+                name = "Setup",
+                comment = updatedComment,
+                errorMessage = sbuilder.ToString()
+            };
+
+            var jsonString = JsonConvert.SerializeObject(options);
+            var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
+            Console.WriteLine($"Json String:{jsonString}");
+            var response = await jsonClient.PatchAsync(requestUrl, httpContent);
+            if (!response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(responseContent);
+            }
+
+            return response.StatusCode;
         }
 
         private static async Task<TestRunResultDetailsResponse> GetTestRunDetails(int releaseId)
